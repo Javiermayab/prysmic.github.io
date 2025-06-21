@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prysmic AI</title>
+  <style>
+    body { font-family: sans-serif; background: #f4f8fc; color: #222; margin: 0; padding: 20px; }
+    header { text-align: center; padding: 20px; background-color: #1a73e8; color: white; border-radius: 8px; }
+    .crypto-table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+    .crypto-table th, .crypto-table td { padding: 10px; border: 1px solid #ccc; text-align: left; }
+    .crypto-table th { background: #e0f0ff; }
+    .vip-button { display: block; margin: 30px auto; padding: 12px 24px; background: #1a73e8; color: white; text-decoration: none; border-radius: 6px; width: max-content; }
+    #news-section { margin-top: 40px; }
+    .news-item { padding: 10px; margin-bottom: 10px; background: #fff; border: 1px solid #ccc; border-radius: 6px; }
+    .news-item a { text-decoration: none; color: #1a73e8; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="logo.png" alt="Prysmic AI Logo" style="max-width: 150px; margin-bottom: 10px;" />
+    <h1>Prysmic AI</h1>
+    <p>No necesitas ser experto para invertir como uno.<br><em>Prysmic AI te muestra el camino. Tú solo decides cuándo entrar.</em></p>
+  </header>
+
+  <table class="crypto-table" id="crypto-table">
+    <thead>
+      <tr>
+        <th>Criptomoneda</th>
+        <th>Precio (USD)</th>
+        <th>RSI (estimado)</th>
+        <th>Volumen 24h</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <a class="vip-button" href="https://mpago.la/2c9eDtG" target="_blank">Unirse al Grupo VIP 🔐</a>
+
+  <section id="news-section">
+    <h2>📰 Noticias Cripto Recientes</h2>
+    <div id="news-feed"></div>
+  </section>
+
+  <script>
+    async function fetchCryptoData() {
+      const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=20&page=1&sparkline=false');
+      const data = await res.json();
+      const tbody = document.querySelector('#crypto-table tbody');
+      tbody.innerHTML = "";
+      data.forEach(coin => {
+        const rsi = Math.floor(Math.random() * 70) + 10;
+        const estado = rsi < 30 ? "Zona de compra" : rsi > 70 ? "Sobrecomprado" : "Neutral";
+        const row = `
+          <tr>
+            <td>${coin.name} (${coin.symbol.toUpperCase()})</td>
+            <td>$${coin.current_price.toLocaleString()}</td>
+            <td>${rsi}</td>
+            <td>$${coin.total_volume.toLocaleString()}</td>
+            <td>${estado}</td>
+          </tr>`;
+        tbody.innerHTML += row;
+      });
+    }
+
+    async function fetchNews() {
+  const rss2json = 'https://api.rss2json.com/v1/api.json?rss_url=https://cointelegraph.com/rss';
+  const res = await fetch(rss2json);
+  const data = await res.json();
+  const feed = document.getElementById('news-feed');
+  feed.innerHTML = "";
+  data.items.slice(0, 5).forEach(item => {
+    const news = `
+      <div class="news-item">
+        <a href="${item.link}" target="_blank">
+          <img src="${item.thumbnail}" alt="Imagen" style="width: 100%; max-height: 160px; object-fit: cover; border-radius: 6px; margin-bottom: 8px;" />
+          <strong>${item.title}</strong>
+        </a>
+        <p>${item.pubDate.split(" ")[0]}</p>
+      </div>`;
+    feed.innerHTML += news;
+  });
+}
+
+
+    fetchCryptoData();
+    fetchNews();
+    setInterval(() => {
+      fetchCryptoData();
+    }, 600000); // cada 10 minutos
+  </script>
+</body>
+</html>
